@@ -1,0 +1,122 @@
+<style>
+    table {
+      font-family: arial, sans-serif;
+      border-collapse: collapse;
+      width: 100%;
+    }
+    
+    td, th {
+      border: 1px solid #dddddd;
+      text-align: left;
+      padding: 8px;
+    }
+    
+    tr:nth-child(even) {
+      background-color: #dddddd;
+    }
+</style>
+<body><h1>Your Bets</h1></body>
+
+{% if driver_race %} 
+<body>
+    <h2>Driver Race Bets</h2>
+    <table style="width:100%">
+    <tr>
+        <th>Driver</th>
+        <th>Race</th>
+        <th>Odds</th>
+        <th>Wager</th>
+        <th>Completed</th>
+    </tr>
+
+    {% for n in driver_race %}
+    <tr>
+        <td>{{n.0}}</td>
+        <td>{{n.2}}</td>
+        <td>{{n.4}}</td>
+        <td>{{n.5}}</td>
+        <td>{{n.6}}</td>
+    </tr>
+    {% endfor %}
+
+    </table>
+</body>
+{% endif %}
+
+{% if driver_season %} 
+<body>
+    <h2>Driver Season Bets</h2>
+    <table style="width:100%">
+    <tr>
+        <th>Driver</th>
+        <th>Season</th>
+        <th>Odds</th>
+        <th>Wager</th>
+        <th>Completed</th>
+    </tr>
+
+    {% for n in driver_season %}
+    <tr>
+        <td>{{n.0}}</td>
+        <td>{{n.3}}</td>
+        <td>{{n.4}}</td>
+        <td>{{n.5}}</td>
+        <td>{{n.6}}</td>
+    </tr>
+    {% endfor %}
+
+    </table>
+</body>
+{% endif %}
+
+{% if team_race %} 
+<body>
+    <h2>Team Race Bets</h2>
+    <table style="width:100%">
+    <tr>
+        <th>Team</th>
+        <th>Race</th>
+        <th>Odds</th>
+        <th>Wager</th>
+        <th>Completed</th>
+    </tr>
+
+    {% for n in team_race %}
+    <tr>
+        <td>{{n.1}}</td>
+        <td>{{n.2}}</td>
+        <td>{{n.4}}</td>
+        <td>{{n.5}}</td>
+        <td>{{n.6}}</td>
+    </tr>
+    {% endfor %}
+
+    </table>
+</body>
+{% endif %}
+
+{% if driver_season %} 
+<body>
+    <h2>Team Season Bets</h2>
+    <table style="width:100%">
+    <tr>
+        <th>Team</th>
+        <th>Race</th>
+        <th>Odds</th>
+        <th>Wager</th>
+        <th>Completed</th>
+    </tr>
+
+    {% for n in team_season %}
+    <tr>
+        <td>{{n.0}}</td>
+        <td>{{n.3}}</td>
+        <td>{{n.4}}</td>
+        <td>{{n.5}}</td>
+        <td>{{n.6}}</td>
+    </tr>
+    {% endfor %}
+
+    </table>
+</body>
+{% endif %}

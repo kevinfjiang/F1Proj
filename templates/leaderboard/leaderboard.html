@@ -1,0 +1,59 @@
+<style>
+    table {
+      font-family: arial, sans-serif;
+      border-collapse: collapse;
+      width: 100%;
+    }
+    
+    td, th {
+      border: 1px solid #dddddd;
+      text-align: left;
+      padding: 8px;
+    }
+    
+    tr:nth-child(even) {
+      background-color: #dddddd;
+    }
+</style>
+
+<body>
+    <h1>Top Drivers</h1>
+    <table style="width:100%">
+    <tr>
+        <th>Name</th>
+        <th>Nationality</th>
+        <th>Team</th>
+        <th>Points</th>
+    </tr>
+
+    {% for n in drivers %}
+    <tr>
+        <td>{{n.0}}</td>
+        <td>{{n.1}}</td>
+        <td>{{n.2}}</td>
+        <td>{{n.3}}</td>
+    </tr>
+    {% endfor %}
+
+    </table>
+</body>
+
+<body>
+    <h1>Top Teams</h1>
+    <table style="width:100%">
+    <tr>
+        <th>Name</th>
+        <th>Country</th>
+        <th>Points</th>
+    </tr>
+
+    {% for n in teams %}
+    <tr>
+        <td>{{n.0}}</td>
+        <td>{{n.1}}</td>
+        <td>{{n.2}}</td>
+    </tr>
+    {% endfor %}
+
+    </table>
+</body>

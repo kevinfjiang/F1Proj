@@ -1,0 +1,29 @@
+<html>
+  <head>
+    <title>Sign-Up</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="static/bootstrap.min.css" rel="stylesheet" media="screen">
+  </head>
+  <body>
+    <div class="container">
+      <h1>Please Signup</h1>
+      <br>
+      <form action="" method="post">
+        <input type="text" placeholder="Email" name="email" value="{{
+          request.form.username }}"><br>
+        <input type="text" placeholder="Full Name" name="name" value="{{
+            request.form.username }}"><br>
+         <input type="password" placeholder="Password" name="password" value="{{
+          request.form.password }}"><br>
+          <input type="password" placeholder="Confirm Password" name="confirm_password" value="{{
+            request.form.password }}"><br>
+            <input type="text" placeholder="Address" name="address" value="{{
+                request.form.password }}"><br>
+        <input class="btn btn-default" type="submit" value="Signup">
+      </form>
+      {% if error %}
+        <p class="error"><strong>Error:</strong> {{ error }}
+      {% endif %}
+    </div>
+  </body>
+</html>
