@@ -1,0 +1,28 @@
+<html>
+  <head>
+    <title>Place Bets</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  </head>
+  <body>
+    <div class="container">
+      <h1>Place Bets Here</h1>
+      <br>
+      <form action="" method="post">
+        <input type="text" placeholder="Email" name="email" value="{{
+          request.form.username }}"><br>
+        <input type="text" placeholder="Full Name" name="name" value="{{
+            request.form.username }}"><br>
+         <input type="password" placeholder="Password" name="password" value="{{
+          request.form.password }}"><br>
+          <input type="password" placeholder="Confirm Password" name="confirm_password" value="{{
+            request.form.password }}"><br>
+            <input type="text" placeholder="Address" name="address" value="{{
+                request.form.password }}"><br>
+        <input class="btn btn-default" type="submit" value="Place Bet">
+      </form>
+      {% if error %}
+        <p class="error"><strong>Error:</strong> {{ error }}
+      {% endif %}
+    </div>
+  </body>
+</html>

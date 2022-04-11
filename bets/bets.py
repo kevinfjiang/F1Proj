@@ -30,11 +30,22 @@ def mybets():
     }
     find_type = lambda entry: tuple(i for i, val in enumerate(entry[:4]) if val!=None)
     for bet in c:
-        match find_type(bet):
-            case (0, 2):  bet_types['driver_race'].append(bet)
-            case (0, 3):  bet_types['driver_season'].append(bet)
-            case (1, 2):  bet_types['team_race'].append(bet)
-            case (1, 3):  bet_types['driver_season'].append(bet)
+        bet_type = find_type(bet) 
+        if bet_type == (0,2):
+            bet_types['driver_race'].append(bet)
+        elif bet_type == (0,3):
+            bet_types['driver_season'].append(bet)
+        elif bet_type == (1,2):
+            bet_types['team_race'].append(bet)
+        else:
+            bet_types['driver_season'].append(bet)
+
+
+        #match find_type(bet):
+        #   case (0, 2):  bet_types['driver_race'].append(bet)
+        #   case (0, 3):  bet_types['driver_season'].append(bet)
+        #   case (1, 2):  bet_types['team_race'].append(bet)
+        #   case (1, 3):  bet_types['driver_season'].append(bet)
     
     return f.render_template('bets/bets.html', **bet_types)
     

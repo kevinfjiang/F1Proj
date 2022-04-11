@@ -36,8 +36,8 @@ app.secret_key="12341"
 # For your convenience, we already set it to the class database
 
 # Use the DB credentials you received by e-mail
-DB_USER = os.getenv('user')
-DB_PASSWORD = os.getenv('password')
+DB_USER = 'pg2682'  #os.getenv('user')
+DB_PASSWORD = '7440'  #os.getenv('password')
 
 DB_SERVER = "w4111.cisxo09blonu.us-east-1.rds.amazonaws.com"
 
