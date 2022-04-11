@@ -6,19 +6,43 @@
   <body>
     <div class="container">
       <h1>Place Bets Here</h1>
+      <p> One of Driver or Team must be None</p>
       <br>
       <form action="" method="post">
-        <input type="text" placeholder="Email" name="email" value="{{
-          request.form.username }}"><br>
-        <input type="text" placeholder="Full Name" name="name" value="{{
-            request.form.username }}"><br>
-         <input type="password" placeholder="Password" name="password" value="{{
-          request.form.password }}"><br>
-          <input type="password" placeholder="Confirm Password" name="confirm_password" value="{{
-            request.form.password }}"><br>
-            <input type="text" placeholder="Address" name="address" value="{{
-                request.form.password }}"><br>
-        <input class="btn btn-default" type="submit" value="Place Bet">
+	<label for="driver">Choose a Driver:</label>
+        <select name="driver" id="driver">
+	  {% for d in drivers %}
+          <option value={{d.0}}>{{d.1}} </option> 
+	  {% endfor %}
+          <option value="NULL">None </option>
+        </select><br>
+        <label for="team">Choose a Team:</label>
+        <select name="team" id="team">
+          {% for t in teams %}
+          <option value="'{{t.0}}'">{{t.0}} </option> 
+          {% endfor %}
+          <option value="NULL">None </option>
+        </select><br>
+	<label for="race">Choose a Race :</label>
+        <select name="race" id="race">
+	  {% for r in races%}
+          <option value={{r.0}}>{{r.1}} </option> 
+	  {% endfor %}
+        </select><br>
+        <label for="OverUnder"> Over or Under </label>
+        <select name="isOver" id = "isOver">
+          <option value="TRUE">Over</option>
+          <option value="FALSE">Under</option>
+        </select><br>
+        <label for="position"> Position </label>
+        <select name="position" id="position">
+          {% for i in range(1,21) %}
+          <option value={{i}}>{{i}}</option>
+          {% endfor %}
+        </select><br>
+        <label for="betSize"> Bet Size: </label>
+        <input type = "number" id="betsize" name="betsize" min="1"><br>
+        <input type="submit" value="Place Bet">
       </form>
       {% if error %}
         <p class="error"><strong>Error:</strong> {{ error }}

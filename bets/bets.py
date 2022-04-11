@@ -1,5 +1,6 @@
 import flask as f
 
+INTERNAL_DB_REGISTER_ERROR = "Database could not register\n Error:{}"
 
 bets = f.Blueprint('bets', __name__, template_folder='templates/bets')
 
@@ -40,13 +41,29 @@ def mybets():
         else:
             bet_types['driver_season'].append(bet)
 
-
-        #match find_type(bet):
-        #   case (0, 2):  bet_types['driver_race'].append(bet)
-        #   case (0, 3):  bet_types['driver_season'].append(bet)
-        #   case (1, 2):  bet_types['team_race'].append(bet)
-        #   case (1, 3):  bet_types['driver_season'].append(bet)
-    
     return f.render_template('bets/bets.html', **bet_types)
-    
-    
+  
+
+
+@bets.route('/placebet', methods = ['GET','POST']) 
+def placebet():
+    if f.request.method == 'GET': 
+       driver_list = list(f.g.conn.execute("""SELECT driverId,name FROM Driver; """))
+       team_list = list(f.g.conn.execute("""SELECT teamNAME FROM Team;  """)) 
+       race_list = list(f.g.conn.execute("""SELECT raceID,raceName FROM Races; """))
+       return f.render_template('bets/placebet.html', drivers = driver_list, teams = team_list, races = race_list)
+    if f.request.method == 'POST':
+        try:
+            bet = f.request.form
+            f.g.conn.execute(f"""
+                           INSERT INTO Bet (odds, isOver, place, raceID, teamName, driverId, completed)
+                           VALUES
+                           (1.0, {bet["isOver"]}, {bet['position']}, {bet['race']},{bet['team']}, {bet['driver']}, FALSE); 
+                           INSERT INTO Bids 
+                           VALUES ({f.g.user['uid']-2},currval('Bet_betid_seq'),{bet['betsize']}); 
+                           """)
+        except Exception as e:
+           print(e)
+           error = INTERNAL_DB_REGISTER_ERROR.format(str(e))
+        return mybets()  
+
