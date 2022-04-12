@@ -65,3 +65,18 @@ def placebet():
            error = INTERNAL_DB_REGISTER_ERROR.format(str(e))
         return mybets()  
 
+@bets.route('/account', methods = ['GET'])
+def show_account():
+    if f.g.user['uid'] == -1: return f.redirect(f.url_for('auth.login'))
+    name = list(f.g.conn.execute(f"""SELECT name FROM Member WHERE uid = {f.g.user['uid']}"""))
+    committed_balance = list(f.g.conn.execute(f"""SELECT SUM(wager) 
+                                                 FROM Bids NATURAL JOIN BET 
+                                                 WHERE uid = {f.g.user['uid']} AND completed = FALSE """))
+    account_balance = list(f.g.conn.execute(f"""SELECT balance FROM member where uid = {f.g.user['uid']}"""))
+    committed_balance = committed_balance[0][0]
+    account_balance = account_balance[0][0]
+    avail_balance = account_balance - committed_balance
+    pl = list(f.g.conn.execute(f"""SELECT SUM(payout) FROM Bids NATURAL JOIN Bet
+                                  WHERE uid = {f.g.user['uid']} AND completed = TRUE"""))
+    pl = pl[0][0]
+    return f.render_template('bets/account.html',name=name,avail=avail_balance,committed=committed_balance,pl=pl)
