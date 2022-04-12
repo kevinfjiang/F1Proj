@@ -4,7 +4,7 @@ INTERNAL_DB_REGISTER_ERROR = "Database could not register\n Error:{}"
 
 bets = f.Blueprint('bets', __name__, template_folder='templates/bets')
 
-@bets.route('/mybets')
+@bets.route('/mybets', methods = ['GET'])
 def mybets():
     if f.g.user['uid'] == -1: return f.redirect(f.url_for('auth.login'))
     c = f.g.conn.execute(f"""
@@ -22,7 +22,10 @@ def mybets():
                          INNER Join Driver
                             ON T.driverid=Driver.driverid
                         """)
-    
+    c = f.g.conn.execute(f"""
+            SELECT *  FROM BIDS NATURAL JOIN BET WHERE uid='{f.g.user['uid']-2}'
+            """)
+ 
     bet_types = {
         'driver_race': [],
         'driver_season': [],
@@ -56,12 +59,12 @@ def placebet():
         try:
             bet = f.request.form
             f.g.conn.execute(f"""
-                           INSERT INTO Bet (odds, isOver, place, raceID, teamName, driverId, completed)
-                           VALUES
-                           (1.0, {bet["isOver"]}, {bet['position']}, {bet['race']},{bet['team']}, {bet['driver']}, FALSE); 
-                           INSERT INTO Bids 
-                           VALUES ({f.g.user['uid']-2},currval('Bet_betid_seq'),{bet['betsize']}); 
-                           """)
+               INSERT INTO Bet (odds, isOver, place, raceID, teamName, driverId, completed)
+               VALUES
+               (1.0, {bet["isOver"]}, {bet['position']}, {bet['race']},{bet['team']}, {bet['driver']}, FALSE); 
+               INSERT INTO Bids 
+               VALUES ({f.g.user['uid']-2},currval('Bet_betid_seq'),{bet['betsize']}); 
+               """)
         except Exception as e:
            print(e)
            error = INTERNAL_DB_REGISTER_ERROR.format(str(e))
