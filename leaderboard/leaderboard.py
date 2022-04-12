@@ -11,6 +11,11 @@ def generate_leaderboard():
     # remove the username from the session if it is there
     return f.render_template('leaderboard/leaderboard.html', teams=team_list, drivers=drive_list)
 
+@leaderboard.route('/api/leaderboard')
+def get_driver_leaders_json() -> str:
+    drive_list = get_driver_leaders() 
+    return str(drive_list) 
+
 def get_driver_leaders()-> list:
     return list(f.g.conn.execute("""
                 SELECT T.name, T.nationality, Team.teamName, T.points
