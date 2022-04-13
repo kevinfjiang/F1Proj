@@ -14,7 +14,7 @@ import sqlalchemy
 from flask import Flask, request, render_template, g, redirect, Response, session
 
 
-from auth.login import auth
+from auth import auth
 from leaderboard.leaderboard import leaderboard
 from bets.bets import bets
 
@@ -36,24 +36,13 @@ app.secret_key="12341"
 # For your convenience, we already set it to the class database
 
 # Use the DB credentials you received by e-mail
-DB_USER = os.getenv('user')
-DB_PASSWORD = os.getenv('password')
+DB_USER = 'pg2682'  #os.getenv('user')
+DB_PASSWORD = '7440'  #os.getenv('password')
 
 DB_SERVER = "w4111.cisxo09blonu.us-east-1.rds.amazonaws.com"
 
-
-
 # This line creates a database engine that knows how to connect to the URI above
 engine = sqlalchemy.create_engine(f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_SERVER}/proj1part2")
-
-
-# Here we create a test table and insert some values in it
-engine.execute("""DROP TABLE IF EXISTS test;""")
-engine.execute("""CREATE TABLE IF NOT EXISTS test (
-id serial,
-name text
-);""")
-engine.execute("""INSERT INTO test(name) VALUES ('grace hopper'), ('alan turing'), ('ada lovelace');""")
 
 @app.before_request
 def start_connect():
@@ -104,19 +93,6 @@ def teardown_request(exception):
         pass
 
 
-#
-# @app.route is a decorator around index() that means:
-#   run index() whenever the user tries to access the "/" path using a GET request
-#
-# If you wanted the user to go to e.g., localhost:8111/foobar/ with POST or GET then you could use
-#
-#       @app.route("/foobar/", methods=["POST", "GET"])
-#
-# PROTIP: (the trailing / in the path is important)
-# 
-# see for routing: http://flask.pocoo.org/docs/0.10/quickstart/#routing
-# see for decorators: http://simeonfranklin.com/blog/2012/jul/1/python-decorators-in-12-steps/
-#
 @app.route('/')
 def index():
     """
@@ -140,54 +116,13 @@ def index():
         names.append(result['name'])  # can also be accessed using result[0]
     cursor.close()
 
-    #
-    # Flask uses Jinja templates, which is an extension to HTML where you can
-    # pass data to a template and dynamically generate HTML based on the data
-    # (you can think of it as simple PHP)
-    # documentation: https://realpython.com/blog/python/primer-on-jinja-templating/
-    #
-    # You can see an example template in templates/index.html
-    #
-    # context are the variables that are passed to the template.
-    # for example, "data" key in the context variable defined below will be 
-    # accessible as a variable in index.html:
-    #
-    #     # will print: [u'grace hopper', u'alan turing', u'ada lovelace']
-    #     <div>{{data}}</div>
-    #     
-    #     # creates a <div> tag for each element in data
-    #     # will print: 
-    #     #
-    #     #   <div>grace hopper</div>
-    #     #   <div>alan turing</div>
-    #     #   <div>ada lovelace</div>
-    #     #
-    #     {% for n in data %}
-    #     <div>{{n}}</div>
-    #     {% endfor %}
-    #
     context = dict(data = names)
 
 
     #
     # render_template looks in the templates/ folder for files.
-    # for example, the below file reads template/index.html
     #
-    return render_template("index.html", **context)
-
-
-
-
-# Example of adding new data to the database
-@app.route('/add', methods=['POST'])
-def add():
-    name = request.form['name']
-    print (name)
-    cmd = 'INSERT INTO test(name) VALUES (:name1)';
-    g.conn.execute(sqlalchemy.text(cmd), name1 = name)
-    return redirect('/')
-
-
+    return render_template("index.html")
 
 
 if __name__ == "__main__":

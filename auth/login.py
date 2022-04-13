@@ -1,11 +1,11 @@
 import flask as f
 import hashlib
+from auth import auth
+
 INVALID_CHAR="Invalid character found in username"
 USER_NOT_FOUND="The username or password you are looking for cannot be found"
 BAD_REQUEST="Something went wrong..."
 INTERNAL_DB_REGISTER_ERROR="Database could not register user. sorry about that \n ERROR:{}"
-
-auth = f.Blueprint('auth', __name__, template_folder='templates/auth')
 
 def sanitize(*args) -> bool: return True
 def p_hash(password) -> str: 
@@ -14,8 +14,9 @@ def p_hash(password) -> str:
 
 
 @auth.route('/login', methods=['GET', 'POST'])
-def login(): 
+def login(error=None): 
     error = None
+    if f.g.user.get('uid', -1) != -1: return f.redirect(f.url_for('index'))
     if f.request.method == 'POST':
         if not sanitize(f.request.form['username']): 
             error=INVALID_CHAR
@@ -34,7 +35,7 @@ def login():
                 return f.redirect(f.url_for('index'))
             else:
                 error=USER_NOT_FOUND
-    return f.render_template('auth/login.html', error=error)
+    return f.render_template('auth/login.html',name="dog", error=error)
 
 @auth.route('/logout')
 def logout():
@@ -43,15 +44,17 @@ def logout():
    f.session.pop('passhash', None)
    return f.redirect(f.url_for('index')) 
 
-@auth.route('/signup', methods=['GET', 'POST']) # TODO prevent signed in from getting here
+@auth.route('/signup', methods=['GET', 'POST']) # TODO prevent signing in from getting here
 def signup():
+    if f.g.user.get('uid', -1) != -1: return f.redirect(f.url_for('index'))
     error = None
     if f.request.method == 'GET': return f.render_template('auth/signup.html')
     if f.request.method == 'POST': 
-        #TODO Lots of checking here will be necessary
-        # if not sanitize(f.request.form['email']): 
-        #     error=INVALID_CHAR
-        if not (h := p_hash(f.request.form['password'])):
+        if not all(sanitize(entry) for entry in f.request.form.values()): 
+            error=INVALID_CHAR
+        elif f.request.get("password") != f.request.get("confirm_password"):
+            error="Password and Confirm Password do not match"
+        elif not (h := p_hash(f.request.form['password'])):
             error=USER_NOT_FOUND
         if not error:
             try:
@@ -77,7 +80,4 @@ def signup():
                 error=INTERNAL_DB_REGISTER_ERROR.format(str(e))  
         return f.render_template('auth/signup.html', error=error) 
 
-@auth.route('/another')
-def another():
-    return f.render_template('anotherfile.html', auth=f.g.user['passhash'])
-            
+
