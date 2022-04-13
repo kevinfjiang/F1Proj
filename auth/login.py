@@ -16,6 +16,7 @@ def p_hash(password) -> str:
 @auth.route('/login', methods=['GET', 'POST'])
 def login(): 
     error = None
+    if f.g.user.get('uid', -1) != -1: return f.redirect(f.url_for('index'))
     if f.request.method == 'POST':
         if not sanitize(f.request.form['username']): 
             error=INVALID_CHAR
@@ -43,8 +44,9 @@ def logout():
    f.session.pop('passhash', None)
    return f.redirect(f.url_for('index')) 
 
-@auth.route('/signup', methods=['GET', 'POST']) # TODO prevent signed in from getting here
+@auth.route('/signup', methods=['GET', 'POST']) # TODO prevent signing in from getting here
 def signup():
+    if f.g.user.get('uid', -1) != -1: return f.redirect(f.url_for('index'))
     error = None
     if f.request.method == 'GET': return f.render_template('auth/signup.html')
     if f.request.method == 'POST': 
