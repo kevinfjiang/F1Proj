@@ -35,7 +35,7 @@ def login():
                 return f.redirect(f.url_for('index'))
             else:
                 error=USER_NOT_FOUND
-    return f.render_template('auth/login.html', error=error)
+    return f.render_template('auth/login.html',name="dog", error=error)
 
 @auth.route('/logout')
 def logout():

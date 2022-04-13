@@ -9,7 +9,12 @@ def generate_leaderboard():
     drive_list = get_driver_leaders()
     team_list = get_team_leaders()
     # remove the username from the session if it is there
-    return f.render_template('leaderboard/leaderboard.html', teams=team_list, drivers=drive_list)
+    return f.render_template('statistics/leaderboard.html', teams=team_list, drivers=drive_list)
+
+@leaderboard.route('/api/leaderboard')
+def get_driver_leaders_json() -> str:
+    drive_list = get_driver_leaders() 
+    return str(drive_list) 
 
 def get_driver_leaders()-> list:
     return list(f.g.conn.execute("""
@@ -25,7 +30,7 @@ def get_driver_leaders()-> list:
                                         ) AS T3 ON Driver.driverId = T3.driverId
                             ) AS T2 ON T2.driverId = DrivesFor.driverId 
                 ) as T ON T.teamName=Team.teamName
-                ORDER BY T.points DESC, T.name ASC;
+                ORDER BY T.points DESC, T.name ASC LIMIT 10;
                 """))
     
 def get_team_leaders()-> list: #TODO
