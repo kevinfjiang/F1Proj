@@ -15,8 +15,8 @@ from flask import Flask, request, render_template, g, redirect, Response, sessio
 
 
 from auth import auth
+from bets import bets
 from leaderboard.leaderboard import leaderboard
-from bets.bets import bets
 
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 app = Flask(__name__, template_folder=tmpl_dir)

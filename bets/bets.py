@@ -1,8 +1,7 @@
 import flask as f
+from bets import bets
 
 INTERNAL_DB_REGISTER_ERROR = "Database could not register\n Error:{}"
-
-bets = f.Blueprint('bets', __name__, template_folder='templates/bets')
 
 @bets.route('/mybets', methods = ['GET'])
 def mybets():
