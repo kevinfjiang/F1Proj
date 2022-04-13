@@ -17,12 +17,15 @@ from flask import Flask, request, render_template, g, redirect, Response, sessio
 from auth import auth
 from leaderboard.leaderboard import leaderboard
 from bets.bets import bets
+from leaderboard.stats import stats 
+
 
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 app = Flask(__name__, template_folder=tmpl_dir)
 app.register_blueprint(auth)
 app.register_blueprint(leaderboard)
 app.register_blueprint(bets)
+app.register_blueprint(stats)
 app.secret_key="12341"
 
 # XXX: The Database URI should be in the format of: 
