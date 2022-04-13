@@ -14,7 +14,7 @@ import sqlalchemy
 from flask import Flask, request, render_template, g, redirect, Response, session
 
 
-from auth.login import auth
+from auth import auth
 from leaderboard.leaderboard import leaderboard
 from bets.bets import bets
 
