@@ -17,8 +17,9 @@ Also run an `export USER={Pranav's UNI}`  and `export PASSWORD={DB Password}`
     - Sanatize inputs
     - Sanatize the signup process
     - Registering a credit card
-    - Registering new bids
-    - Race information
+    - Race information - Make stats board to see info on different drivers
+    - Making logic to update bets based on race results 
+    - Make logic to calculate payouts and update accounts based on bet outcomes 
 
 ## Directory
 `
