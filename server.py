@@ -55,6 +55,7 @@ def start_connect():
     try:
         g.conn = engine.connect()
         load_user()
+        payout.update_payout()
     except:
         print ("uh oh, problem connecting to database")
         import traceback; traceback.print_exc()
@@ -63,16 +64,17 @@ def start_connect():
 def load_user():
     while bool(uid := session.get("uid")) & bool(h := session.get("passhash")): # non shortcurcuit or
         try:
-            raw_return = g.conn.execute(f"""
+            raw_return = g.conn.execute("""
                                         SELECT *
                                         FROM Member
-                                        WHERE uid='{uid}'
-                                        AND PassHash='{h}'
-                                        """)
+                                        WHERE uid=%(uid)s
+                                        AND PassHash=%(hash)s
+                                        """, {'uid': uid,
+                                              'hash': h})
             user = dict(zip(raw_return.keys(), next(raw_return)))
-            # payout.update_payout
             break # Skips else
-        except (TypeError, sqlalchemy.exc.ProgrammingError, StopIteration) as e:
+        except (TypeError, sqlalchemy.exc.ProgrammingError, sqlalchemy.exc.OperationalError, StopIteration) as e:
+            print(e)
             session.pop('uid')
             session.pop('passhash') # Definitely log this
             # If we get here, we go to the else and clean session
@@ -91,6 +93,7 @@ def teardown_request(exception):
         g.conn.close()
         g.user=None
     except Exception as e:
+        print(e)
         pass
 
 
@@ -105,21 +108,7 @@ def index():
     """
 
     # DEBUG: this is debugging code to see what request looks like
-    print( request.args)
-
-
-    #
-    # example of a database query
-    #
-    cursor = g.conn.execute("SELECT name FROM test")
-    names = []
-    for result in cursor:
-        names.append(result['name'])  # can also be accessed using result[0]
-    cursor.close()
-
-    context = dict(data = names)
-
-
+    print(request.args)
     #
     # render_template looks in the templates/ folder for files.
     #

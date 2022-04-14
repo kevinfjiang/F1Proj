@@ -1,5 +1,6 @@
 import flask as f
 from bets import bets
+import psycopg2
 
 INTERNAL_DB_REGISTER_ERROR = "Database could not register\n Error:{}"
 
@@ -51,14 +52,15 @@ def placebet():
        return f.render_template('bets/placebet.html', drivers = driver_list, teams = team_list, races = race_list)
     if f.request.method == 'POST':
         try:
-            bet = f.request.form
             f.g.conn.execute(f"""
                INSERT INTO Bet (odds, isWon, place, raceID, teamName, driverId, completed)
                VALUES
-               (1.0, {bet['isWon']}, {bet['position']}, {bet['race']},{bet['team']}, {bet['driver']}, FALSE); 
+               (100, %(isWon)s, %(position)s, %(race)s, %(team)s, %(driver)s, FALSE); 
                INSERT INTO Bids 
-               VALUES ({f.g.user['uid']},currval('Bet_betid_seq'),{bet['betsize']}); 
-               """)
+               VALUES ({f.g.user['uid']},currval('Bet_betid_seq'), %(betsize)s); 
+               """, f.request.form)
+        except psycopg2.errors.UniqueViolation as e: # Have better error handling
+            error="Duplicate bet, placing this bet seperately"
         except Exception as e:
            print(e)
            error = INTERNAL_DB_REGISTER_ERROR.format(str(e))
