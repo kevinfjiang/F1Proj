@@ -15,7 +15,7 @@ from flask import Flask, request, render_template, g, redirect, Response, sessio
 
 
 from auth import auth
-from bets import bets
+from bets import bets, payout
 from leaderboard.leaderboard import leaderboard
 
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
@@ -70,6 +70,7 @@ def load_user():
                                         AND PassHash='{h}'
                                         """)
             user = dict(zip(raw_return.keys(), next(raw_return)))
+            # payout.update_payout
             break # Skips else
         except (TypeError, sqlalchemy.exc.ProgrammingError, StopIteration) as e:
             session.pop('uid')

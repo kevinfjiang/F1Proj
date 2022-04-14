@@ -54,7 +54,7 @@ def transfer_credit():
             c = f.g.conn.execute(f"""
                                 SELECT credit_card
                                 FROM Member
-                                WHERE uid='{f.g.user['uid']}'
+                                WHERE uid={f.g.user['uid']}
                                 AND PassHash='{f.g.user.get('passhash', -1)}'
                                 """)
             if (valid_card := checksum(next(c)[0])):

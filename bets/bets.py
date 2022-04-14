@@ -3,15 +3,16 @@ from bets import bets
 
 INTERNAL_DB_REGISTER_ERROR = "Database could not register\n Error:{}"
 
-@bets.route('/mybets', methods = ['GET'])
-def mybets():
+@bets.route('/mybets/<int:outstanding>', methods = ['GET'])
+def mybets(outstanding: int=0):
     if f.g.user['uid'] == -1: return f.redirect(f.url_for('auth.login'))
+    if outstanding not in [0,1]: return f.redirect(f.url_for('bets.show_account'))
     c = f.g.conn.execute(f"""
-                         SELECT Driver.name, T.teamName, Races.raceName, T.isover, T.place,  T.season, T.odds, T.wager, T.completed
-                         FROM ( SELECT * FROM BIDS NATURAL JOIN BET WHERE uid ={f.g.user['uid']}) AS T
+                         SELECT Driver.name, T.teamName, Races.raceName, T.isWon, T.place,  T.season, T.odds, T.wager, T.completed
+                         FROM ( SELECT * FROM BIDS NATURAL JOIN BET WHERE uid ={f.g.user['uid']} AND completed='{outstanding}')  AS T
                          INNER JOIN Races
                             ON T.raceId=Races.raceId
-                         left Join Driver
+                         LEFT Join Driver
                             ON T.driverid=Driver.driverid
                         """)
     bet_types = {
@@ -20,7 +21,6 @@ def mybets():
         'team_race': [],
         'team_season': [],
     }
-    find_type = lambda entry: tuple(i for i, val in enumerate(entry[:4]) if val!=None)
     for bet in c:
         if bet[0] != None:
             bet_types['driver_race'].append(bet)
@@ -53,9 +53,9 @@ def placebet():
         try:
             bet = f.request.form
             f.g.conn.execute(f"""
-               INSERT INTO Bet (odds,isover, place, raceID, teamName, driverId, completed)
+               INSERT INTO Bet (odds, isWon, place, raceID, teamName, driverId, completed)
                VALUES
-               (1.0, {bet["isOver"]}, {bet['position']}, {bet['race']},{bet['team']}, {bet['driver']}, FALSE); 
+               (1.0, {bet['isWon']}, {bet['position']}, {bet['race']},{bet['team']}, {bet['driver']}, FALSE); 
                INSERT INTO Bids 
                VALUES ({f.g.user['uid']},currval('Bet_betid_seq'),{bet['betsize']}); 
                """)
