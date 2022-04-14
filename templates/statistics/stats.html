@@ -1,59 +1,99 @@
-<style>
-    table {
-      font-family: arial, sans-serif;
-      border-collapse: collapse;
-      width: 100%;
-    }
-    
-    td, th {
-      border: 1px solid #dddddd;
-      text-align: left;
-      padding: 8px;
-    }
-    
-    tr:nth-child(even) {
-      background-color: #dddddd;
-    }
-</style>
+<html>
+  <head>
+    <title>View Statistics</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  </head>
+  <body>
+    <div class="container">
+      <h1>Look Up Results Here</h1>
+      <p> This page returns the results for a driver, a team, or the placements of all drivers for a given race. From the dropdown chose which you would like to select. Two of the fields must be set to None. </p>
+      <br>
+      <form action="" method="post">
+	<label for="driver">Choose a Driver:</label>
+        <select name="driver" id="driver">
+	  {% for d in drivers %}
+          <option value={{d.0}}>{{d.1}} </option> 
+	  {% endfor %}
+          <option value="NULL">None </option>
+        </select><br>
+        <label for="team">Choose a Team:</label>
+        <select name="team" id="team">
+          {% for t in teams %}
+          <option value="'{{t.0}}'">{{t.0}} </option> 
+          {% endfor %}
+          <option value="NULL">None </option>
+        </select><br>
+	<label for="race">Choose a Race :</label>
+        <select name="race" id="race">
+	  {% for r in races%}
+          <option value={{r.0}}>{{r.1}} </option> 
+	  {% endfor %}
+          <option value="NULL">None </option>
+        </select><br>
+        <input type="submit" value="Look Up">
+      </form>
+      {% if error %}
+        <p class="error"><strong>Error:</strong> {{ error }}
+      {% endif %}
+    </div>
 
-<body>
-    <h1>Top Drivers</h1>
+    {% if driver_rec %}
+    <h1> Driver Results </h1>
     <table style="width:100%">
     <tr>
-        <th>Name</th>
-        <th>Nationality</th>
-        <th>Team</th>
-        <th>Points</th>
+            <th>Race</th>
+            <th>Position</th>
+            <th>Points</th>
     </tr>
 
-    {% for n in drivers %}
+    {% for r in driver_rec %}
     <tr>
-        <td>{{n.0}}</td>
-        <td>{{n.1}}</td>
-        <td>{{n.2}}</td>
-        <td>{{n.3}}</td>
+         <td> {{r.0}} </td>
+         <td> {{r.0}} </td>
+         <td> {{r.0}} </td>
     </tr>
     {% endfor %}
 
-    </table>
-</body>
+    {% endif %}
 
-<body>
-    <h1>Top Teams</h1>
-    <table style="width:100%">
+    {% if team_rec %}
+    <h1> Team Results </h1>
+
+    <table style="width:100%">   
     <tr>
-        <th>Name</th>
-        <th>Country</th>
-        <th>Points</th>
+            <th>Race</th>
+            <th>Position</th>
+            <th>Points</th>
     </tr>
 
-    {% for n in teams %}
+    {% for r in driver_rec %}
     <tr>
-        <td>{{n.0}}</td>
-        <td>{{n.1}}</td>
-        <td>{{n.2}}</td>
+         <td> {{r.0}} </td>
+         <td> {{r.0}} </td>
+         <td> {{r.0}} </td>
     </tr>
-    {% endfor %}
+    {% endfor %}                 
 
-    </table>
-</body>
+    {% endif %}
+
+    {%if race_rec %}
+    <h1> Race Results </h1> 
+     <table style="width:100%">      
+     <tr>
+             <th>DriverId</th>
+             <th>Name</th> 
+             <th>Position</th>
+             <th>Points</th>
+     </tr>
+                                   
+     {% for r in driver_rec %}
+     <tr>
+          <td> {{r.0}} </td>
+          <td> {{r.0}} </td> 
+          <td> {{r.0}} </td>
+          <td> {{r.0}} </td>
+     </tr>
+     {% endfor %}                 
+    {% endif %}
+  </body>
+</html>
