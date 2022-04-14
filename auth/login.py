@@ -1,13 +1,15 @@
 import flask as f
 import hashlib
 from auth import auth
+from psycopg2 import sql
 
 INVALID_CHAR="Invalid character found in username"
 USER_NOT_FOUND="The username or password you are looking for cannot be found"
 BAD_REQUEST="Something went wrong..."
 INTERNAL_DB_REGISTER_ERROR="Database could not register user. sorry about that \n ERROR:{}"
 
-def sanitize(*args) -> bool: return True
+def sanitize(query) -> bool:
+    return True
 def p_hash(password) -> str: 
     if not isinstance(password, str) or len(password)<4: return None
     return hashlib.sha224(password.encode('UTF-8')).hexdigest()
