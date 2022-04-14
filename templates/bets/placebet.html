@@ -18,10 +18,14 @@
         </select><br>
         <label for="team">Choose a Team:</label>
         <select name="team" id="team">
+          <option value="NULL">None </option>
           {% for t in teams %}
           <option value="'{{t.0}}'">{{t.0}} </option> 
           {% endfor %}
+<<<<<<< HEAD
           <option value="null">None </option>
+=======
+>>>>>>> origin/pranav
         </select><br>
     <label for="race">Choose a Race :</label>
         <select name="race" id="race">
