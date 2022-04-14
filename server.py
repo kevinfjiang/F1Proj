@@ -64,7 +64,9 @@ def start_connect():
         
 
 def load_user():
-    while bool(uid := session.get("uid")) & bool(h := session.get("passhash")): # non shortcurcuit or
+    user={'uid': -1,
+          'passhash': -1}
+    if bool(uid := session.get("uid")) & bool(h := session.get("passhash")): # non shortcurcuit or
         try:
             raw_return = g.conn.execute("""
                                         SELECT *
@@ -74,15 +76,11 @@ def load_user():
                                         """, {'uid': uid,
                                               'hash': h})
             user = dict(zip(raw_return.keys(), next(raw_return)))
-            break # Skips else
         except (TypeError, sqlalchemy.exc.ProgrammingError, sqlalchemy.exc.OperationalError, StopIteration) as e:
             print(e)
             session.pop('uid')
             session.pop('passhash') # Definitely log this
             # If we get here, we go to the else and clean session
-    else:
-        user = {'uid': -1,
-                'passhash': -1}  # Make it better, use an anonymous User instead
     g.user = user
 
 @app.teardown_request

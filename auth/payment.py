@@ -27,10 +27,10 @@ def register_credit():
             try:
                 f.g.conn.execute(f"""
                                 UPDATE Member
-                                SET credit_card='{c}'
+                                SET credit_card=%s
                                 WHERE uid={f.g.user['uid']}
                                 AND PassHash='{f.g.user.get('passhash', -1)}'
-                                """)
+                                """, (c,))
                 c = f.g.conn.execute(f"""
                                 SELECT credit_card
                                 FROM Member
@@ -48,7 +48,7 @@ def register_credit():
 @auth.route('/addfunds', methods=['GET', 'POST'])
 def transfer_credit():
     error=None
-    if f.g.user.get('uid', -1) == -1: return f.redirect(f.url_for('auth.login'))
+    if f.g.user.get('uid', -1) == -1: return f.redirect(f.url_for('bets.show_account'))
     if f.request.method == 'POST':
         try:
             c = f.g.conn.execute(f"""
@@ -57,16 +57,18 @@ def transfer_credit():
                                 WHERE uid={f.g.user['uid']}
                                 AND PassHash='{f.g.user.get('passhash', -1)}'
                                 """)
-            if (valid_card := checksum(next(c)[0])):
-                f.g.conn.execute(f"""
+            card = next(c)
+            if card[0] and (valid_card := checksum(card[0])):
+                c = f.g.conn.execute(f"""
                                 UPDATE Member
                                 SET balance = balance + {int(f.request.form['addfund'])}
                                 WHERE uid={f.g.user['uid']}
-                                AND PassHash='{f.g.user.get('passhash', -1)}'
                                 AND credit_card='{valid_card}'
                                 """)
-                return f.redirect(f.url_for('index'))
-        except (sqlalchemy.exc.ProgrammingError, StopIteration):
+                return f.redirect(f.url_for('bets.show_account'))
+            else: error="No card under your user"
+        except (sqlalchemy.exc.ProgrammingError, sqlalchemy.exc.OperationalError, StopIteration) as e:
+            print(e)
             error="No card under your user"
         except ValueError:
             error="Please enter a valid amount of funds to transfer with only integers"
