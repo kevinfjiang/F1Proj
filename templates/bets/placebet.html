@@ -9,25 +9,25 @@
       <p> One of Driver or Team must be None</p>
       <br>
       <form action="" method="post">
-	<label for="driver">Choose a Driver:</label>
+    <label for="driver">Choose a Driver:</label>
         <select name="driver" id="driver">
-	  {% for d in drivers %}
+      {% for d in drivers %}
           <option value={{d.0}}>{{d.1}} </option> 
-	  {% endfor %}
-          <option value="NULL">None </option>
+      {% endfor %}
+          <option value="null">None </option>
         </select><br>
         <label for="team">Choose a Team:</label>
         <select name="team" id="team">
           {% for t in teams %}
           <option value="'{{t.0}}'">{{t.0}} </option> 
           {% endfor %}
-          <option value="NULL">None </option>
+          <option value="null">None </option>
         </select><br>
-	<label for="race">Choose a Race :</label>
+    <label for="race">Choose a Race :</label>
         <select name="race" id="race">
-	  {% for r in races%}
+      {% for r in races%}
           <option value={{r.0}}>{{r.1}} </option> 
-	  {% endfor %}
+      {% endfor %}
         </select><br>
         <label for="OverUnder"> Over or Under </label>
         <select name="isOver" id = "isOver">

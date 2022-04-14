@@ -1,15 +1,15 @@
-from tempfile import TemporaryDirectory
 import flask as f
+import sqlalchemy
 from bets import bets
-import psycopg2
+import logging
 
 INTERNAL_DB_REGISTER_ERROR = "Database could not register\n Error:{}"
 
-def insert_informs(driverId, raceId, betId):
+def insert_informs(driverId, raceId, betId, teamname="null"):
     f.g.conn.execute("""
-                INSERT INTO Informs (betID, driverId, raceId)
+                INSERT INTO Informs (betID, driverId, raceId, teamname)
                 VALUES
-                (%s, %s, %s)""", (driverId, raceId, betId))
+                (%s, %s, %s, %s)""", (driverId, raceId, betId, teamname))
     
     
 
@@ -17,13 +17,12 @@ def enter_informs_driver(driverName, raceId, betId):
     driverId = next(f.g.conn.execute("""SELECT driverId 
                                         From DrivesFor WHERE name=%s"""), (driverName,))
     insert_informs(driverId, raceId, betId)
-...
     
 def enter_informs_team(team, raceId, betId):
     for driverId in f.g.conn.execute("""SELECT driverId 
                                      From DrivesFor WHERE teamName=%s""", 
                                      (team,)):
-        insert_inform(betId, driverId, raceId)
+        insert_informs(betId, driverId, raceId, team)
     
 
 
@@ -40,28 +39,30 @@ def create_informs_ent(form, betId):
 
 @bets.route('/placebet', methods = ['GET','POST']) 
 def placebet():
+    error=None
+    driver_list = list(f.g.conn.execute("""SELECT driverId,name FROM Driver; """))
+    team_list = list(f.g.conn.execute("""SELECT teamNAME FROM Team;  """)) 
+    race_list = list(f.g.conn.execute("""SELECT raceID,raceName FROM Races; """))
     if f.request.method == 'GET': 
-       driver_list = list(f.g.conn.execute("""SELECT driverId,name FROM Driver; """))
-       team_list = list(f.g.conn.execute("""SELECT teamNAME FROM Team;  """)) 
-       race_list = list(f.g.conn.execute("""SELECT raceID,raceName FROM Races; """))
        return f.render_template('bets/placebet.html', drivers = driver_list, teams = team_list, races = race_list)
     if f.request.method == 'POST':
         try:
-            betId = next(f.g.conn.execute(f"""
+            #TODO CHECK that the bet hasn't expired, super simple check
+            f.g.conn.execute(f"""
                INSERT INTO Bet (odds, isOver, place, raceID, teamName, driverId, completed)
                VALUES
-               (100, %(isOver)s, %(position)s, %(race)s, %(team)s, %(driver)s, FALSE); 
+               (100, %(isOver)s, %(position)s, %(race)s, %(season)s, %(driver)s, FALSE); 
                INSERT INTO Bids 
-               VALUES ({f.g.user['uid']},currval('Bet_betid_seq'), %(betsize)s)
-               RETURNING currval('Bet_betid_seq'); 
-               """, f.request.form))
-            create_informs_ent(f.request.form, betId)
-        except psycopg2.errors.UniqueViolation as e: # Have better error handling
-            error="Duplicate bet, placing this bet seperately"
+               VALUES ({f.g.user['uid']}, currval('Bet_betid_seq'), %(betsize)s) 
+               """, f.request.form)
+            create_informs_ent(f.request.form, next(f.g.conn.execute("SELECT currval('Bet_betid_seq')")))
+        except sqlalchemy.exc.IntegrityError:
+            logging.log(logging.ERROR, "Repeated keys, double check new race is updated")
         except Exception as e:
            print(e)
-           error = INTERNAL_DB_REGISTER_ERROR.format(str(e))
-        return f.redirect(f.url_for('bets.mybets/0')) 
+           error = INTERNAL_DB_REGISTER_ERROR.format(e)
+        if not error: return f.redirect(f.url_for('bets.mybets', outstanding=0)) 
+        return f.render_template('bets/placebet.html', error=error, drivers = driver_list, teams = team_list, races = race_list)
 
 
         
