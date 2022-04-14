@@ -11,17 +11,17 @@
       <form action="" method="post">
 	<label for="driver">Choose a Driver:</label>
         <select name="driver" id="driver">
+          <option value="NULL">None </option>
 	  {% for d in drivers %}
           <option value={{d.0}}>{{d.1}} </option> 
 	  {% endfor %}
-          <option value="NULL">None </option>
         </select><br>
         <label for="team">Choose a Team:</label>
         <select name="team" id="team">
+          <option value="NULL">None </option>
           {% for t in teams %}
           <option value="'{{t.0}}'">{{t.0}} </option> 
           {% endfor %}
-          <option value="NULL">None </option>
         </select><br>
 	<label for="race">Choose a Race :</label>
         <select name="race" id="race">
