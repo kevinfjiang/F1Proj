@@ -33,7 +33,7 @@ def get_driver_leaders()-> list:
                 ORDER BY T.points DESC, T.name ASC LIMIT 10;
                 """))
     
-def get_team_leaders()-> list: #TODO
+def get_team_leaders()-> list:
     return list(f.g.conn.execute("""
                     SELECT Team.teamName, Team.country, T.points
                     FROM TEAM 

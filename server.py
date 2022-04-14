@@ -54,6 +54,8 @@ def start_connect():
     We use it to setup a database connection that can be used throughout the request
     The variable g is globally accessible
     """
+    g.user={'uid': -1,
+          'passhash': -1}
     try:
         g.conn = engine.connect()
         load_user()
@@ -64,7 +66,7 @@ def start_connect():
         
 
 def load_user():
-    user={'uid': -1,
+    g.user={'uid': -1,
           'passhash': -1}
     if bool(uid := session.get("uid")) & bool(h := session.get("passhash")): # non shortcurcuit or
         try:
@@ -75,13 +77,14 @@ def load_user():
                                         AND PassHash=%(hash)s
                                         """, {'uid': uid,
                                               'hash': h})
-            user = dict(zip(raw_return.keys(), next(raw_return)))
+            g.user = dict(zip(raw_return.keys(), next(raw_return)))
         except (TypeError, sqlalchemy.exc.ProgrammingError, sqlalchemy.exc.OperationalError, StopIteration) as e:
             print(e)
+            g.user={'uid': -1,
+                    'passhash': -1}
             session.pop('uid')
             session.pop('passhash') # Definitely log this
             # If we get here, we go to the else and clean session
-    g.user = user
 
 @app.teardown_request
 def teardown_request(exception):

@@ -4,6 +4,7 @@ import xml.etree.ElementTree as ET
 import unidecode
 import numpy as np
 import sqlalchemy
+import logging
 DB_USER = 'pg2682' 
 DB_PASSWORD = '7440' 
 
@@ -54,14 +55,25 @@ raceId = next(c.execute("""SELECT raceId
                             AND season=%s""", (race_data['RaceName'], race_data['Date'].split('-')[0])))[0]
 
 print(raceId)
-print(list(c.execute("""
-          INSERT (driverID, raceID, position, points)
-          INTO Competes_Record
+logging.INFO(f"Addding latest race{race_data['RaceName']} {race_data['Date'].split('-')[0]} data to table")
+logging.log(logging.INFO, f"Addding latest race{race_data['RaceName']} {race_data['Date'].split('-')[0]} data to table")
+try:
+    list(c.execute("""
+          INSERT INTO Competes_Record
+          (driverID, raceID, position, points)
           SELECT Driver.driverID, %s, temp_positions.place, temp_positions.points
           FROM temp_positions
           INNER JOIN Driver
             ON Driver.name=temp_positions.name
-          """, (raceId,))))
+          """, (raceId,)))
+except sqlalchemy.exc.IntegrityError:
+    logging.log(logging.INFO, "Repeated keys, double check new race is updated")
+except Exception as e:
+    logging.log(logging.WARN, f"Internal DB Error: {e}")
+
+
+
+
 
 # We need something for existing bets
 # FROM HERE, check all informs that reference these races_records and 
