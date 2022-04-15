@@ -1,6 +1,5 @@
 import flask as f
 import sqlalchemy
-import psycopg2
 def update_payout()->None:
     if f.g.user['uid']==-1: return
     try:
@@ -36,7 +35,7 @@ def update_payout()->None:
                         WHERE (uid, betId) IN (SELECT uid, betID FROM recent_complete_bids)
                         """)
 
-    except (sqlalchemy.exc.ProgrammingError, psycopg2.errors.UniqueViolation) as e:
+    except (sqlalchemy.exc.ProgrammingError, sqlalchemy.exc.IntegrityError) as e:
         print(e)
         print("Failure to update")
     
