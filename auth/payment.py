@@ -1,6 +1,7 @@
 import flask as f
 from auth import auth
 import helper.helper as helper
+import logging
 import sqlalchemy
 
 def checksum(cardNo: str)->str:
@@ -70,7 +71,7 @@ def transfer_credit():
                 return f.redirect(f.url_for('bets.show_account'))
             else: error="No card under your user"
         except (sqlalchemy.exc.ProgrammingError, sqlalchemy.exc.OperationalError, StopIteration) as e:
-            print(e)
+            logging.warn(f"Error in execution, usually because of lack of credit card, {e}")
             error="No card under your user"
         except ValueError:
             error="Please enter a valid amount of funds to transfer with only integers"

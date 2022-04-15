@@ -19,9 +19,6 @@ def display_stat(driver = None, team = None, race = None):
 
 @stats.route('/stats/results', methods = ['GET'])
 def show_result(driver = None, team = None, race = None):
-     
-    print(driver,team,race)
-
     if driver != 'NULL':
         driver_rec = list(f.g.conn.execute(f"""SELECT raceName, position, points, name FROM Competes_Record NATURAL JOIN Races NATURAL JOIN Driver 
                     WHERE driverId = {driver}"""))
@@ -32,7 +29,6 @@ def show_result(driver = None, team = None, race = None):
                         WHERE driverId in (SELECT driverId
                                             FROM Driver NATURAL JOIN Drivesfor 
                                             WHERE teamname = {team})""")) 
-        print(team_rec)
         return helper.render('statistics/statsDisplay.html', team_rec = team_rec, teamname = team[1:-1]) 
 
     elif race != 'NULL':

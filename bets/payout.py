@@ -1,5 +1,6 @@
 import flask as f
 import sqlalchemy
+import logging
 def update_payout()->None:
     if f.g.user['uid']==-1: return
     try:
@@ -36,6 +37,6 @@ def update_payout()->None:
                         """)
 
     except (sqlalchemy.exc.ProgrammingError, sqlalchemy.exc.IntegrityError) as e:
-        print(e)
+        logging.warn(f"Failed to update due to reason {e}")
         print("Failure to update")
     

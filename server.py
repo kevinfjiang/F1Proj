@@ -26,7 +26,7 @@ app.register_blueprint(auth)
 app.register_blueprint(leaderboard)
 app.register_blueprint(bets)
 app.register_blueprint(stats)
-app.secret_key=os.getenv('secret_key')
+app.secret_key=os.urandom(12).hex()
 
 # XXX: The Database URI should be in the format of: 
 #
@@ -39,7 +39,7 @@ app.secret_key=os.getenv('secret_key')
 # For your convenience, we already set it to the class database
 
 # Use the DB credentials you received by e-mail
-DB_USER = os.getenv('user')
+DB_USER = os.getenv('USER')
 DB_PASSWORD = os.getenv('password')
 
 DB_SERVER = "w4111.cisxo09blonu.us-east-1.rds.amazonaws.com"
@@ -80,7 +80,7 @@ def load_user():
                                               'hash': h})
             g.user = dict(zip(raw_return.keys(), next(raw_return)))
         except (TypeError, sqlalchemy.exc.ProgrammingError, sqlalchemy.exc.OperationalError, StopIteration) as e:
-            print(e)
+            logging.warn(f"Error with existing creditials {e}, being replaced")
             g.user={'uid': -1,
                     'passhash': -1}
             session.pop('uid')
@@ -98,7 +98,7 @@ def teardown_request(exception):
         if hasattr(g, "conn"):
             g.conn.close()
     except Exception as e:
-        print(e)
+        logging.warn(f"Failed to close due to {e}")
         pass
 
 @app.errorhandler(404)
@@ -126,7 +126,6 @@ def index():
     """
 
     # DEBUG: this is debugging code to see what request looks like
-    print(request.args)
     #
     # render_template looks in the templates/ folder for files.
     #
@@ -151,7 +150,7 @@ if __name__ == "__main__":
         """
 
         HOST, PORT = host, port
-        print ("running on %s:%d" % (HOST, PORT))
+        logging.info("running on %s:%d" % (HOST, PORT))
         app.run(host=HOST, port=PORT, debug=debug, threaded=threaded)
 
 
