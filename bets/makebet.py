@@ -1,4 +1,5 @@
 import flask as f
+from requests import request
 from bets import bets
 import helper.helper as helper
 import datetime
@@ -79,7 +80,7 @@ def placebet():
                 INSERT INTO Bids (uid, betId, wager)
                 VALUES ({f.g.user['uid']}, currval('Bet_betid_seq'), %(betsize)s) 
                 RETURNING currval('Bet_betid_seq')
-                """, f.request.form))
+                """, {k:(v if v!="null" else None) for k, v in f.request.form.items()}})
                 create_informs_ent(f.request.form, betId[0])
             except sqlalchemy.exc.IntegrityError:
                 logging.log(logging.ERROR, "Repeated keys, double check new race is updated")
