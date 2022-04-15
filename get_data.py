@@ -6,8 +6,8 @@ import numpy as np
 import sqlalchemy
 import logging
 import os
-DB_USER = os.getenv('user')
-DB_PASSWORD = os.getenv('password')
+DB_USER = 'pg2682'
+DB_PASSWORD = '7440'
 
 DB_SERVER = 'w411.cisxo9blonu.us-east-1.rds.amazonaws.com' 
 

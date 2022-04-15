@@ -17,27 +17,14 @@ def insert_informs(betId, raceId, driverId, teamname=None):
     except Exception as e:
         import traceback; print(traceback.format_exc())
         raise e
-        
-    
-
-def enter_informs_driver(driverName, raceId, betId):
-    driverId = next(f.g.conn.execute("""SELECT driverId 
-                                        From DrivesFor WHERE name=%s"""), (driverName,))
-    insert_informs(driverId, raceId, betId)
-    
-def enter_informs_team(team, raceId, betId):
-    for driverId in f.g.conn.execute("""SELECT driverId 
-                                     From DrivesFor WHERE teamName=%s""", 
-                                     (team,)):
-        insert_informs(betId, driverId, raceId, team)
     
 
 def create_informs_ent(form, betId):
-    if form['team'] != "null":
+    if form['team'] != "NULL":
         for driverId in f.g.conn.execute("""SELECT driverId 
                                      From DrivesFor WHERE teamName=%s""", 
                                      (form['team'],)):
-            insert_informs(betId, form['race'], driverId,  form['team'])
+            insert_informs(betId, form['race'], driverId[0],  form['team'])
     else:
         insert_informs(betId, form['race'], form['driver'])
 
@@ -77,6 +64,7 @@ def placebet():
             error="You don't have enough funds, brokeass"
         else:
             try:
+                print({k:(v if v!="NULL" else None) for k, v in f.request.form.items()})
                 betId = next(f.g.conn.execute(f"""
                 INSERT INTO Bet (odds, isOver, place, raceID, teamName, driverId, completed)
                 VALUES
@@ -84,9 +72,10 @@ def placebet():
                 INSERT INTO Bids (uid, betId, wager)
                 VALUES ({f.g.user['uid']}, currval('Bet_betid_seq'), %(betsize)s) 
                 RETURNING currval('Bet_betid_seq')
-                """, {k:(v if v!="null" else None) for k, v in f.request.form.items()}})
+                """, {k:(v if v!="NULL" else None) for k, v in f.request.form.items()}))
                 create_informs_ent(f.request.form, betId[0])
             except sqlalchemy.exc.IntegrityError:
+                
                 logging.log(logging.ERROR, "Integrity error, did you follow all the instructions in the input")
                 error="Make sure to follow all the instructions of the input"
             except Exception as e:
