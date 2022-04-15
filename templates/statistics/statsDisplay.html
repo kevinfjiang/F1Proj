@@ -19,7 +19,7 @@
 <html>
     <a href = "/stats"> Make a new query </a> 
     {% if driver_rec %}
-    <h1> Driver Results </h1>
+    <h1> Driver Results For {{driver_rec[0].3}}</h1> 
     <table style="width:100%">
     <tr>
             <th>Race</th>
@@ -38,11 +38,12 @@
     {% endif %}
 
     {% if team_rec %}
-    <h1> Team Results </h1>
+    <h1> Team Results For {{teamname}} </h1>
 
     <table style="width:100%">   
     <tr>
             <th>Race</th>
+            <th>Driver Name </th>
             <th>Position</th>
             <th>Points</th>
     </tr>
@@ -52,13 +53,14 @@
          <td> {{r.0}} </td>
          <td> {{r.1}} </td>
          <td> {{r.2}} </td>
+         <td> {{r.3}} </td> 
     </tr>
     {% endfor %}                 
 
     {% endif %}
 
     {%if race_rec %}
-    <h1> Race Results </h1> 
+    <h1> Race Results For {{race_rec[0].4}} </h1> 
      <table style="width:100%">      
      <tr>
              <th>DriverId</th>

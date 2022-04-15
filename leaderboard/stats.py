@@ -24,18 +24,18 @@ def show_result(driver = None, team = None, race = None):
     print(driver,team,race)
 
     if driver != 'NULL':
-        driver_rec = list(f.g.conn.execute(f"""SELECT raceName, position, points FROM Competes_Record NATURAL JOIN Races  
+        driver_rec = list(f.g.conn.execute(f"""SELECT raceName, position, points, name FROM Competes_Record NATURAL JOIN Races NATURAL JOIN Driver 
                     WHERE driverId = {driver}"""))
         return f.render_template('statistics/statsDisplay.html', driver_rec = driver_rec)
 
     elif team != 'NULL':
-        team_rec = list(f.g.conn.execute(f"""SELECT raceName, position, points FROM Competes_Record NATURAL JOIN Races 
+        team_rec = list(f.g.conn.execute(f"""SELECT raceName, name,  position, points FROM Competes_Record NATURAL JOIN Races NATURAL JOIN Driver 
                         WHERE driverId in (SELECT driverId
                                             FROM Driver NATURAL JOIN Drivesfor 
                                             WHERE teamname = {team})""")) 
         print(team_rec)
-        return f.render_template('statistics/statsDisplay.html', team_rec = team_rec) 
+        return f.render_template('statistics/statsDisplay.html', team_rec = team_rec, teamname = team[1:-1]) 
 
     elif race != 'NULL':
-        race_rec = list(f.g.conn.execute(f"""SELECT driverId, name, position, points FROM Competes_Record NATURAL JOIN Races NATURAL JOIN Driver WHERE raceId = {race}"""))
+        race_rec = list(f.g.conn.execute(f"""SELECT driverId, name, position, points, racename FROM Competes_Record NATURAL JOIN Races NATURAL JOIN Driver WHERE raceId = {race} ORDER BY position ASC """))
         return f.render_template('statistics/statsDisplay.html', race_rec = race_rec) 
