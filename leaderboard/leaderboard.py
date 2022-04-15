@@ -1,4 +1,5 @@
 import flask as f
+import helper.helper as helper
 
 
 leaderboard = f.Blueprint('leaderboard', __name__, template_folder='templates/auth')
@@ -10,7 +11,7 @@ def generate_leaderboard():
     team_list = get_team_leaders()
     # remove the username from the session if it is there
 
-    return f.render_template('statistics/leaderboard.html', teams=team_list, drivers=drive_list)
+    return helper.render('statistics/leaderboard.html', teams=team_list, drivers=drive_list)
 
 @leaderboard.route('/api/leaderboard')
 def get_driver_leaders_json() -> str:

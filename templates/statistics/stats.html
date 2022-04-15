@@ -6,15 +6,68 @@
   <body>
     <div class="container">
       <h1>Look Up Results Here</h1>
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+        body {font-family: Arial;}
+        
+        /* Style the tab */
+        .tab {
+          overflow: hidden;
+          border: 1px solid #ccc;
+          background-color: #f1f1f1;
+        }
+        
+        /* Style the buttons inside the tab */
+        .tab button {
+          background-color: inherit;
+          float: left;
+          border: none;
+          outline: none;
+          cursor: pointer;
+          padding: 14px 16px;
+          transition: 0.3s;
+          font-size: 17px;
+        }
+        
+        /* Change background color of buttons on hover */
+        .tab button:hover {
+          background-color: #ddd;
+        }
+        
+        /* Create an active/current tablink class */
+        .tab button.active {
+          background-color: #ccc;
+        }
+        
+    
+        </style>
+        </head>
+        <body>
+        
+        
+        <div class="tab">
+            {% if uid==-1 %} <button class="tablinks" onclick="location.href = '/login';">Login Here</button>
+            {% else %} <button class="tablinks" onclick="location.href = '/account';">My Account</button>
+                   <button class="tablinks" onclick="location.href = '/placebet';">Place a Bet</button>
+                   <button class="tablinks" onclick="location.href = '/logout';">Logout</button>
+            {% endif %}
+          <button class="tablinks" onclick="location.href = '/leaderboard';">Leaderboards</button>
+          <button class="tablinks" onclick="location.href = '/stats';">Stats</button>
+        </div>
+        
+        
+           
+    </body><br>
       <p> This page returns the results for a driver, a team, or the placements of all drivers for a given race. From the dropdown chose which you would like to select. Two of the fields must be set to None. </p>
       <br>
       <form action="" method="post">
-	<label for="driver">Choose a Driver:</label>
+    <label for="driver">Choose a Driver:</label>
         <select name="driver" id="driver">
           <option value="NULL">None </option> 
-	  {% for d in drivers %}
+      {% for d in drivers %}
           <option value={{d.0}}>{{d.1}} </option> 
-	  {% endfor %}
+      {% endfor %}
         </select><br>
         <label for="team">Choose a Team:</label>
         <select name="team" id="team">
@@ -23,12 +76,12 @@
           <option value="'{{t.0}}'">{{t.0}} </option> 
           {% endfor %}
         </select><br>
-	<label for="race">Choose a Race :</label>
+    <label for="race">Choose a Race :</label>
         <select name="race" id="race">
           <option value="NULL">None </option>
-	  {% for r in races%}
+      {% for r in races%}
           <option value={{r.0}}>{{r.1}} </option> 
-	  {% endfor %}
+      {% endfor %}
         </select><br>
         <input type="submit" value="Look Up">
       </form>

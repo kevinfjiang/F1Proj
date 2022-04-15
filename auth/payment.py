@@ -1,5 +1,6 @@
 import flask as f
 from auth import auth
+import helper.helper as helper
 import sqlalchemy
 
 def checksum(cardNo: str)->str:
@@ -44,7 +45,7 @@ def register_credit():
             error="Invalid credit card number"
 
     
-    return f.render_template('auth/credit.html', error=error) 
+    return helper.render('auth/credit.html', error=error) 
 
 @auth.route('/addfunds', methods=['GET', 'POST'])
 def transfer_credit():
@@ -74,4 +75,4 @@ def transfer_credit():
         except ValueError:
             error="Please enter a valid amount of funds to transfer with only integers"
 
-    return f.render_template('auth/addfunds.html', error=error)
+    return helper.render('auth/addfunds.html', error=error)

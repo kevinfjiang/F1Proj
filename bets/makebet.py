@@ -1,7 +1,8 @@
 import flask as f
-import sqlalchemy
 from bets import bets
+import helper.helper as helper
 import datetime
+import sqlalchemy
 import logging
 
 INTERNAL_DB_REGISTER_ERROR = "Database could not register\n Error:{}"
@@ -39,14 +40,14 @@ def create_informs_ent(form, betId):
     else:
         insert_informs(betId, form['race'], form['driver'])
 
-def check_cash(size:str)->bool:
-    committed_balance = list(f.g.conn.execute(f"""SELECT SUM(wager) 
+def check_cash(size: int)->bool:
+    committed_balance = list(f.g.conn.execute(f"""SELECT COALESCE(SUM(wager), 0) 
                                                  FROM Bids NATURAL JOIN BET 
                                                  WHERE uid = {f.g.user['uid']} AND completed = FALSE """))
-    account_balance = list(f.g.conn.execute(f"""SELECT balance FROM member WHERE uid = {f.g.user['uid']}"""))
+    account_balance = list(f.g.conn.execute(f"""SELECT COALESCE(balance, 0) FROM member WHERE uid = {f.g.user['uid']}"""))
     committed_balance = committed_balance[0][0]
     account_balance = account_balance[0][0]
-    return account_balance-committed_balance-size>0
+    return account_balance-committed_balance-int(size)<0
 
 def check_prior(race:str)->bool:
     resp = list(f.g.conn.execute("""
@@ -63,7 +64,7 @@ def placebet():
     team_list = list(f.g.conn.execute("""SELECT teamNAME FROM Team ORDER BY teamName ASC;  """)) 
     race_list = list(f.g.conn.execute("""SELECT raceID,raceName FROM Races WHERE stop > CURRENT_DATE OR stop IS NULL ORDER BY raceID ASC, stop ASC; """))
     if f.request.method == 'GET': 
-       return f.render_template('bets/placebet.html', drivers = driver_list, teams = team_list, races = race_list)
+       return helper.render('bets/placebet.html', drivers = driver_list, teams = team_list, races = race_list)
     if f.request.method == 'POST':
         if check_prior(f.request.form['race']):
             error="Can't place a bet on a race that passed!"
@@ -86,4 +87,4 @@ def placebet():
             except Exception as e:
                 error = INTERNAL_DB_REGISTER_ERROR.format(e)
         if not error: return f.redirect(f.url_for('bets.mybets', outstanding=0)) 
-        return f.render_template('bets/placebet.html', error=error, drivers = driver_list, teams = team_list, races = race_list)
+        return helper.render('bets/placebet.html', error=error, drivers = driver_list, teams = team_list, races = race_list)

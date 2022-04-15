@@ -11,7 +11,7 @@ Read about it online.
 
 import os
 import sqlalchemy
-from flask import Flask, request, render_template, g, redirect, Response, session
+from flask import Flask, request, url_for, render_template, g, redirect, Response, session
 
 
 from auth import auth
@@ -116,7 +116,7 @@ def index():
     #
     # render_template looks in the templates/ folder for files.
     #
-    return render_template("index.html")
+    return redirect(url_for("stats.display_stat"))
 
 
 if __name__ == "__main__":
