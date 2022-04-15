@@ -8,14 +8,14 @@ import logging
 
 INTERNAL_DB_REGISTER_ERROR = "Database could not register\n Error:{}"
 
-def insert_informs(betId, raceId, driverId, teamname="null"):
+def insert_informs(betId, raceId, driverId, teamname=None):
     try:
         f.g.conn.execute("""
                     INSERT INTO Informs (betID, raceId, driverId, teamname)
                     VALUES
                     (%s, %s, %s, %s)""", (betId, raceId, driverId, teamname))
     except Exception as e:
-        print(e)
+        import traceback; print(traceback.format_exc())
         raise e
         
     
@@ -42,13 +42,16 @@ def create_informs_ent(form, betId):
         insert_informs(betId, form['race'], form['driver'])
 
 def check_cash(size: int)->bool:
-    committed_balance = list(f.g.conn.execute(f"""SELECT COALESCE(SUM(wager), 0) 
+    try:
+        committed_balance = list(f.g.conn.execute(f"""SELECT COALESCE(SUM(wager), 0) 
                                                  FROM Bids NATURAL JOIN BET 
                                                  WHERE uid = {f.g.user['uid']} AND completed = FALSE """))
-    account_balance = list(f.g.conn.execute(f"""SELECT COALESCE(balance, 0) FROM member WHERE uid = {f.g.user['uid']}"""))
-    committed_balance = committed_balance[0][0]
-    account_balance = account_balance[0][0]
-    return account_balance-committed_balance-int(size)<0
+        account_balance = list(f.g.conn.execute(f"""SELECT COALESCE(balance, 0) FROM member WHERE uid = {f.g.user['uid']}"""))
+        committed_balance = committed_balance[0][0]
+        account_balance = account_balance[0][0]
+        return account_balance-committed_balance-int(size if size else 0)<0
+    except (IndexError, sqlalchemy.exc.IntegrityError, sqlalchemy.exc.ProgrammingError):
+        return True
 
 def check_prior(race:str)->bool:
     resp = list(f.g.conn.execute("""
@@ -61,6 +64,7 @@ def check_prior(race:str)->bool:
 @bets.route('/placebet', methods = ['GET','POST']) 
 def placebet():
     error=None
+    if f.g.user.get('uid', -1) == -1: return f.redirect(f.url_for('auth.login'))
     driver_list = list(f.g.conn.execute("""SELECT driverId,name FROM Driver ORDER BY name ASC; """))
     team_list = list(f.g.conn.execute("""SELECT teamNAME FROM Team ORDER BY teamName ASC;  """)) 
     race_list = list(f.g.conn.execute("""SELECT raceID,raceName FROM Races WHERE stop > CURRENT_DATE OR stop IS NULL ORDER BY raceID ASC, stop ASC; """))
@@ -76,15 +80,15 @@ def placebet():
                 betId = next(f.g.conn.execute(f"""
                 INSERT INTO Bet (odds, isOver, place, raceID, teamName, driverId, completed)
                 VALUES
-                (100, %(isOver)s, %(position)s, %(race)s, null, %(driver)s, FALSE); 
+                (100, %(isOver)s, %(position)s, %(race)s, %(team)s, %(driver)s, FALSE); 
                 INSERT INTO Bids (uid, betId, wager)
                 VALUES ({f.g.user['uid']}, currval('Bet_betid_seq'), %(betsize)s) 
                 RETURNING currval('Bet_betid_seq')
                 """, {k:(v if v!="null" else None) for k, v in f.request.form.items()}})
                 create_informs_ent(f.request.form, betId[0])
             except sqlalchemy.exc.IntegrityError:
-                logging.log(logging.ERROR, "Repeated keys, double check new race is updated")
-                error="Repeated bid error, double check new race is updated"
+                logging.log(logging.ERROR, "Integrity error, did you follow all the instructions in the input")
+                error="Make sure to follow all the instructions of the input"
             except Exception as e:
                 error = INTERNAL_DB_REGISTER_ERROR.format(e)
         if not error: return f.redirect(f.url_for('bets.mybets', outstanding=0)) 
