@@ -16,7 +16,7 @@ def update_payout()->None:
                         AND Bids.wager>0)
                             
                         UPDATE Member
-                        SET balance = balance +  (SELECT COALESCE(SUM(CASE WHEN odds>0 THEN (wager*odds)/100 ELSE (wager*100)/odds END ), 0)
+                        SET balance = balance +  (SELECT COALESCE(SUM(CASE WHEN odds>0 THEN (wager*odds)/100 ELSE (wager*100)/-odds END ), 0)
                                                   FROM recent_complete_bids
                                                   WHERE isWon=True)
                         WHERE uid={f.g.user['uid']}""")

@@ -18,6 +18,8 @@ def p_hash(password) -> str:
 @auth.route('/login', methods=['GET', 'POST'])
 def login(error=None): 
     error = None
+    if not hasattr(f.g, "conn"):
+        return f.redirect(f.url_for('index'))
     if f.g.user.get('uid', -1) != -1: return f.redirect(f.url_for('index'))
     if f.request.method == 'POST':
         if not (h := p_hash(f.request.form['password'])):
@@ -31,6 +33,7 @@ def login(error=None):
                                     AND PassHash=%(hash)s
                                     """, {'email': f.request.form['username'],
                                         'hash': h})
+                
                 if (uid := list(c)):
                     f.session['uid']=str(uid[0][0])
                     f.session['passhash']=h
@@ -39,7 +42,7 @@ def login(error=None):
                     error=USER_NOT_FOUND
             except(TypeError, sqlalchemy.exc.ProgrammingError, sqlalchemy.exc.OperationalError, StopIteration)  as e:
                 error=INTERNAL_DB_REGISTER_ERROR.format(e)
-            
+
     return f.render_template('auth/login.html', error=error)
 
 @auth.route('/logout')
@@ -53,6 +56,7 @@ def logout():
 def signup():
     if f.g.user.get('uid', -1) != -1: return f.redirect(f.url_for('index'))
     error = None
+    
     if f.request.method == 'GET': return f.render_template('auth/signup.html')
     if f.request.method == 'POST': 
         if f.request.form.get("password") != f.request.form.get("confirm_password"):
@@ -75,7 +79,9 @@ def signup():
                                 AND PassHash=%(hash)s
                                 """, {'email': f.request.form['username'],
                                         'hash': h})
+                
                 if (uid := list(c)):
+
                     f.session['uid']=str(uid[0][0])
                     f.session['passhash']=h
                     return f.redirect(f.url_for('index'))
@@ -85,6 +91,7 @@ def signup():
                 error="Duplicate user, try logging in"
             except Exception as e: # Have better error handling
                 error=INTERNAL_DB_REGISTER_ERROR.format(e)
+
         return f.render_template('auth/signup.html', error=error) 
 
 

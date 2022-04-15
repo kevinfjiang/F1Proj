@@ -9,6 +9,7 @@ def generate_leaderboard():
     drive_list = get_driver_leaders()
     team_list = get_team_leaders()
     # remove the username from the session if it is there
+
     return f.render_template('statistics/leaderboard.html', teams=team_list, drivers=drive_list)
 
 @leaderboard.route('/api/leaderboard')

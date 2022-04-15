@@ -93,8 +93,9 @@ def teardown_request(exception):
     If you don't the database could run out of memory!
     """
     try:
-        g.conn.close()
         g.user=None
+        if hasattr(g, "conn"):
+            g.conn.close()
     except Exception as e:
         print(e)
         pass

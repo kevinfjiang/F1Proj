@@ -1,6 +1,5 @@
 import flask as f
 from bets import bets
-import psycopg2
 
 INTERNAL_DB_REGISTER_ERROR = "Database could not register\n Error:{}"
 
@@ -8,7 +7,8 @@ INTERNAL_DB_REGISTER_ERROR = "Database could not register\n Error:{}"
 def mybets(outstanding: int=0):
     if f.g.user['uid'] == -1: return f.redirect(f.url_for('auth.login'))
     if outstanding not in [0,1]: return f.redirect(f.url_for('bets.show_account'))
-    c = f.g.conn.execute(f"""
+    try:
+        c = f.g.conn.execute(f"""
                          SELECT Driver.name, T.teamName, Races.raceName, T.isWon, T.isOver, T.place,  T.season, T.odds, T.wager, T.completed
                          FROM ( SELECT * FROM BIDS NATURAL JOIN BET WHERE uid ={f.g.user['uid']} AND completed='{outstanding}')  AS T
                          INNER JOIN Races
@@ -16,6 +16,8 @@ def mybets(outstanding: int=0):
                          LEFT Join Driver
                             ON T.driverid=Driver.driverid
                         """)
+    except Exception:
+        pass
     bet_types = {
         'driver_race': [],
         'driver_season': [],
@@ -57,7 +59,5 @@ def show_account():
     account_balance = account_balance[0][0]
     check_none = lambda v: 0 if v==None else v
     avail_balance = check_none(account_balance) - check_none(committed_balance) # This is pretty clever nice
-    pl = list(f.g.conn.execute(f"""SELECT SUM(payout) FROM Bids NATURAL JOIN Bet
-                                  WHERE uid = {f.g.user['uid']} AND completed = TRUE"""))
-    pl = pl[0][0]
-    return f.render_template('bets/account.html',name=name,avail=avail_balance,committed=committed_balance,pl=check_none(pl))
+
+    return f.render_template('bets/account.html',name=name,avail=avail_balance,committed=committed_balance)

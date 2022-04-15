@@ -36,6 +36,7 @@ def register_credit():
                                 FROM Member
                                 WHERE credit_card='{c}'
                                 """)
+
                 return f.redirect(f.url_for('index'))
             except sqlalchemy.exc.ProgrammingError:
                 error="Invalid credentials error"
@@ -72,5 +73,5 @@ def transfer_credit():
             error="No card under your user"
         except ValueError:
             error="Please enter a valid amount of funds to transfer with only integers"
-    
+
     return f.render_template('auth/addfunds.html', error=error)
