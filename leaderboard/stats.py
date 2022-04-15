@@ -9,36 +9,32 @@ def display_stat(driver = None, team = None, race = None):
     team_list = list(f.g.conn.execute("""SELECT teamName FROM Team;"""))
     race_list = list(f.g.conn.execute("""SELECT raceId, raceName FROM Races;"""))
     if f.request.method == 'POST':
-        return show_result(driver = 1)
-    #    query = f.request.form 
-    #    if query['driver'] != None: return display_stat(driver = query['driver']) 
-    #    elif query['team'] != None: return display_stat(team = query['team'])
-    #    elif query['race'] != None: return display_stat(race = query['race']) 
-    #    else: return f.render_template('statistics/stats.html')
-    
+        query = f.request.form 
+        driver = query['driver']
+        team = query['team']
+        race = query['race']
+        return show_result(driver, team, race) 
+
     return f.render_template('statistics/stats.html', drivers = driver_list, teams = team_list, races = race_list) 
 
 @stats.route('/stats/results', methods = ['GET'])
 def show_result(driver = None, team = None, race = None):
-      
-    driver_list = list(f.g.conn.execute("""SELECT driverId, name FROM Driver;"""))
-    team_list = list(f.g.conn.execute("""SELECT teamName FROM Team;"""))
-    race_list = list(f.g.conn.execute("""SELECT raceId, raceName FROM Races;"""))
+     
+    print(driver,team,race)
 
-    if driver != None:
-        driver_rec = list(f.g.conn.execute(f"""SELECT * FROM Competes_Record NATURAL JOIN Races  
+    if driver != 'NULL':
+        driver_rec = list(f.g.conn.execute(f"""SELECT raceName, position, points, name FROM Competes_Record NATURAL JOIN Races NATURAL JOIN Driver 
                     WHERE driverId = {driver}"""))
+        return f.render_template('statistics/statsDisplay.html', driver_rec = driver_rec)
 
-        return f.render_template('statistics/stats.html', drivers = driver_list, teams = team_list, races = race_list, driver_rec = driver_rec)
-    elif team != None:
-        team_rec = list(f.g.conn.execute(f"""SELECT * FROM Competes_Record 
+    elif team != 'NULL':
+        team_rec = list(f.g.conn.execute(f"""SELECT raceName, name,  position, points FROM Competes_Record NATURAL JOIN Races NATURAL JOIN Driver 
                         WHERE driverId in (SELECT driverId
                                             FROM Driver NATURAL JOIN Drivesfor 
-                                            WHERE teamname = {team})"""))    
+                                            WHERE teamname = {team})""")) 
+        print(team_rec)
+        return f.render_template('statistics/statsDisplay.html', team_rec = team_rec, teamname = team[1:-1]) 
 
-        return f.render_template('statistics/stats.html', drivers = driver_list, teams = team_list, races = race_list, team_rec = team_rec) 
-                                                                                                                                                                        
-    elif race != None:
-        race_rec = list(f.g.conn.execute(f"""SELECT * FROM Competes_Record NATURAL JOIN Races                                                 WHERE raceId = {race}"""))
-
-        return f.render_template('statistics/stats.html', drivers = driver_list, teams = team_list, races = race_list, race_rec = race_rec) 
+    elif race != 'NULL':
+        race_rec = list(f.g.conn.execute(f"""SELECT driverId, name, position, points, racename FROM Competes_Record NATURAL JOIN Races NATURAL JOIN Driver WHERE raceId = {race} ORDER BY position ASC """))
+        return f.render_template('statistics/statsDisplay.html', race_rec = race_rec) 

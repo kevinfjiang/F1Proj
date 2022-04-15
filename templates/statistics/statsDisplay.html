@@ -1,0 +1,82 @@
+<style>
+    table {
+      font-family: arial, sans-serif;
+      border-collapse: collapse;
+      width: 100%;
+    }
+    
+    td, th {
+      border: 1px solid #dddddd;
+      text-align: left;
+      padding: 8px;
+    }
+    
+    tr:nth-child(even) {
+      background-color: #dddddd;
+    }
+</style>
+
+<html>
+    <a href = "/stats"> Make a new query </a> 
+    {% if driver_rec %}
+    <h1> Driver Results For {{driver_rec[0].3}}</h1> 
+    <table style="width:100%">
+    <tr>
+            <th>Race</th>
+            <th>Position</th>
+            <th>Points</th>
+    </tr>
+
+    {% for r in driver_rec %}
+    <tr>
+         <td> {{r.0}} </td>
+         <td> {{r.1}} </td>
+         <td> {{r.2}} </td>
+    </tr>
+    {% endfor %}
+
+    {% endif %}
+
+    {% if team_rec %}
+    <h1> Team Results For {{teamname}} </h1>
+
+    <table style="width:100%">   
+    <tr>
+            <th>Race</th>
+            <th>Driver Name </th>
+            <th>Position</th>
+            <th>Points</th>
+    </tr>
+
+    {% for r in team_rec %}
+    <tr>
+         <td> {{r.0}} </td>
+         <td> {{r.1}} </td>
+         <td> {{r.2}} </td>
+         <td> {{r.3}} </td> 
+    </tr>
+    {% endfor %}                 
+
+    {% endif %}
+
+    {%if race_rec %}
+    <h1> Race Results For {{race_rec[0].4}} </h1> 
+     <table style="width:100%">      
+     <tr>
+             <th>DriverId</th>
+             <th>Name</th> 
+             <th>Position</th>
+             <th>Points</th>
+     </tr>
+                                   
+     {% for r in race_rec %}
+     <tr>
+          <td> {{r.0}} </td>
+          <td> {{r.1}} </td> 
+          <td> {{r.2}} </td>
+          <td> {{r.3}} </td>
+     </tr>
+     {% endfor %}                 
+    {% endif %}
+  </body>
+</html>
