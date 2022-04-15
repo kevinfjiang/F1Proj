@@ -6,8 +6,8 @@ import numpy as np
 import sqlalchemy
 import logging
 import os
-DB_USER = os.getenv('user')
-DB_PASSWORD = os.getenv('password')
+DB_USER = os.getenvenv('user')
+DB_PASSWORD = os.getenvenv('password')
 
 DB_SERVER = 'w411.cisxo9blonu.us-east-1.rds.amazonaws.com' 
 
@@ -38,8 +38,8 @@ points_dict = {1: 25, 2: 18, 3: 15, 4: 12, 5: 10, 6: 8, 7: 6, 8: 4, 9: 2, 10: 1}
 df['points'] = df['place'].apply(lambda pl: points_dict.get(pl, 0))
 df = df[['place','name', 'points']]
     
-DB_USER = 'pg2682'  #os.getenv('user')
-DB_PASSWORD = '7440'  #os.getenv('password')
+DB_USER = 'pg2682'  #os.getenvenv('user')
+DB_PASSWORD = '7440'  #os.getenvenv('password')
 
 DB_SERVER = "w4111.cisxo09blonu.us-east-1.rds.amazonaws.com"
 

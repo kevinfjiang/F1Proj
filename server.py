@@ -25,7 +25,7 @@ app.register_blueprint(auth)
 app.register_blueprint(leaderboard)
 app.register_blueprint(bets)
 app.register_blueprint(stats)
-app.secret_key=os.get('secret_key')
+app.secret_key=os.getenv('secret_key')
 
 # XXX: The Database URI should be in the format of: 
 #
@@ -38,8 +38,8 @@ app.secret_key=os.get('secret_key')
 # For your convenience, we already set it to the class database
 
 # Use the DB credentials you received by e-mail
-DB_USER = os.getenv('user')
-DB_PASSWORD = os.getenv('password')
+DB_USER = os.getenvenv('user')
+DB_PASSWORD = os.getenvenv('password')
 
 DB_SERVER = "w4111.cisxo09blonu.us-east-1.rds.amazonaws.com"
 
