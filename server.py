@@ -101,6 +101,19 @@ def teardown_request(exception):
         print(e)
         pass
 
+@app.errorhandler(404)
+def not_found(exception):
+    return render_template("404.html")
+
+@app.errorhandler(500)
+def not_found(exception):
+    if isinstance(exception, AttributeError):
+        return render_template("500.html", error="Looks like there's a problem with the connection, likely from overuse of our AWS database")
+    elif isinstance(exception, sqlalchemy.exc.IntegrityError):
+        return render_template("500.html", error="Looks like a sever mess up of a SQL query. We'll be investigating!")
+    else: 
+        return render_template("500.html", error="Looks like I have no idea...")
+    
 
 @app.route('/')
 def index():
