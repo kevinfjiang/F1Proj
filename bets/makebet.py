@@ -11,7 +11,6 @@ def insert_informs(driverId, raceId, betId, teamname="null"):
                 VALUES
                 (%s, %s, %s, %s)""", (driverId, raceId, betId, teamname))
     
-    
 
 def enter_informs_driver(driverName, raceId, betId):
     driverId = next(f.g.conn.execute("""SELECT driverId 
@@ -24,7 +23,6 @@ def enter_informs_team(team, raceId, betId):
                                      (team,)):
         insert_informs(betId, driverId, raceId, team)
     
-
 
 def create_informs_ent(form, betId):
     raceId = next(f.g.conn.execute("""
@@ -48,6 +46,7 @@ def placebet():
     if f.request.method == 'POST':
         try:
             #TODO CHECK that the bet hasn't expired, super simple check
+
             f.g.conn.execute(f"""
                INSERT INTO Bet (odds, isOver, place, raceID, teamName, driverId, completed)
                VALUES
@@ -63,8 +62,3 @@ def placebet():
            error = INTERNAL_DB_REGISTER_ERROR.format(e)
         if not error: return f.redirect(f.url_for('bets.mybets', outstanding=0)) 
         return f.render_template('bets/placebet.html', error=error, drivers = driver_list, teams = team_list, races = race_list)
-
-
-        
-    
-    
