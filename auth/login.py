@@ -3,7 +3,6 @@ import hashlib
 from auth import auth
 import helper.helper as helper
 import sqlalchemy
-import psycopg2
 
 INVALID_CHAR="Invalid character found in username"
 USER_NOT_FOUND="The username or password you are looking for cannot be found"

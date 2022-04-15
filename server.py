@@ -18,6 +18,7 @@ from auth import auth
 from bets import bets, payout
 from leaderboard.leaderboard import leaderboard
 from leaderboard.stats import stats 
+import logging
 
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 app = Flask(__name__, template_folder=tmpl_dir)
@@ -38,8 +39,8 @@ app.secret_key=os.getenv('secret_key')
 # For your convenience, we already set it to the class database
 
 # Use the DB credentials you received by e-mail
-DB_USER = os.getenvenv('user')
-DB_PASSWORD = os.getenvenv('password')
+DB_USER = os.getenv('user')
+DB_PASSWORD = os.getenv('password')
 
 DB_SERVER = "w4111.cisxo09blonu.us-east-1.rds.amazonaws.com"
 
@@ -60,8 +61,8 @@ def start_connect():
         g.conn = engine.connect()
         load_user()
         payout.update_payout()
-    except:
-        print ("uh oh, problem connecting to database")
+    except Exception as e:
+        logging.fatal(f"Error with the connection {e}")
         import traceback; traceback.print_exc()
         
 
