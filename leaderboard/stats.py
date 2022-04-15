@@ -1,13 +1,13 @@
 import flask as f 
 import helper.helper as helper
 
-stats = f.Blueprint('stats',__name__, template_folder = 'templates/statistics')
+stats = f.Blueprint('stats', __name__, template_folder = 'templates/statistics')
 
 @stats.route('/stats', methods = ['GET','POST'])
 def display_stat(driver = None, team = None, race = None):
     driver_list = list(f.g.conn.execute("""SELECT driverId,name FROM Driver ORDER BY name ASC; """))
     team_list = list(f.g.conn.execute("""SELECT teamNAME FROM Team ORDER BY teamName ASC;  """)) 
-    race_list = list(f.g.conn.execute("""SELECT raceID,raceName FROM Races WHERE stop > CURRENT_DATE OR stop IS NULL ORDER BY raceID ASC, stop ASC; """))
+    race_list = list(f.g.conn.execute("""SELECT raceID,raceName FROM Races ORDER BY raceID ASC, stop ASC; """))
     if f.request.method == 'POST':
         query = f.request.form 
         driver = query['driver']

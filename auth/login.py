@@ -11,7 +11,7 @@ BAD_REQUEST="Something went wrong..."
 INTERNAL_DB_REGISTER_ERROR="Database could not register user. sorry about that \n ERROR:{}"
 
 def string_sanatize(input_string):
-    return any(p in input_string for p in ['%','/', '\\', ';',"'", '"'])
+    return any(p in input_string for p in ('--','%','/', '\\', ';',"'", '"'))
 
 
 def p_hash(password) -> str: 
@@ -66,7 +66,7 @@ def signup():
     if f.request.method == 'GET': return helper.render('auth/signup.html')
     if f.request.method == 'POST': 
         if any(string_sanatize(f.request.form[key]) for key in ['password', 'confirm_password', 'name', 'address', 'email']):
-            error="Inputs typically can't contain any of these special characters: ['%','/', '\\', '.', ';', ', '\"']"
+            error="Inputs typically can't contain any of these special characters: ['--','%','/', '\\', ';', ', '\"']"
         if f.request.form.get("password") != f.request.form.get("confirm_password"):
             error="Password and Confirm Password do not match"
         elif not (h := p_hash(f.request.form['password'])):
@@ -77,15 +77,15 @@ def signup():
                                 INSERT INTO Member 
                                 (email, PassHash, name, address)
                                 Values
-                                (%(email)s, %(password)s, %(name)s, %(address)s)
-                                """, {'password': h,
+                                (%(email)s, %(passhash)s, %(name)s, %(address)s)
+                                """, {'passhash': h,
                                       **f.request.form}) # Make a create
                 c = f.g.conn.execute("""
                                 SELECT uid
                                 FROM Member
                                 WHERE Email=%(email)s
                                 AND PassHash=%(hash)s
-                                """, {'email': f.request.form['username'],
+                                """, {'email': f.request.form['email'],
                                         'hash': h})
                 
                 if (uid := list(c)):
@@ -95,10 +95,11 @@ def signup():
                     return f.redirect(f.url_for('index'))
                 else:
                     error=USER_NOT_FOUND
-            except psycopg2.errors.UniqueViolation as e: # Have better error handling
+            except sqlalchemy.exc.IntegrityError as e: # Have better error handling
                 error="Duplicate user, try logging in"
             except Exception as e: # Have better error handling
                 error=INTERNAL_DB_REGISTER_ERROR.format(e)
+                raise e
 
         return helper.render('auth/signup.html', error=error) 
 
